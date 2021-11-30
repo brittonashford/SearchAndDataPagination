@@ -5,7 +5,6 @@ FSJS Project 2 - Data Pagination and Filtering
 
 
 /*
-Create the `showPage` function
 This function will create and insert/append the elements needed to display a "page" of nine students
 */
 
@@ -37,6 +36,11 @@ function showPage(list, page) {
     }
 }
 
+
+/*
+ * `addPagination function creates page buttons at the bottom of the page
+ * calls show page when a button is cliked
+ */
 function addPagination(list) {
     let linkList = document.querySelector('ul.link-list');
     const numOfPages = Math.ceil(list.length / 9);
@@ -67,19 +71,54 @@ function addPagination(list) {
     })
 }
 
+/* filterData function uses the string typed into the 
+ * search box to filter the data that will be displayed */
+function filterData(data, searchText) {
+    let filteredList;
+
+    for (i = 0; i < data.length; i++) {
+        let firstName = data[i].name.first.toLowerCase();
+        let lastName = data[i].name.last.toLowerCase();
+        if (firstName.indexOf(searchText.toLowerCase()) !== -1 || lastName.indexOf(searchText.toLowerCase()) !== -1) {
+            console.log("yo");
+        }
+    }
+}
 
 
-
-
+//call showPage for initial view
 showPage(data, 1);
+
+//create page buttons
 addPagination(data);
 
+let header = document.querySelector('header');
+let searchForm = document.createElement('form');
+searchForm.innerHTML = `
+    <form>
+        <label for="search" class="student-search">
+            <span>Search by name</span>
+            <input id="search" placeholder="Search by name...">
+                <button id="search-button" type="button"><img src="img/icn-search.svg" alt="Search icon"></button>
+        </label>
+    </form>`;
+header.insertAdjacentHTML('beforeend', searchForm.innerHTML);
 
-/*
-Create the `addPagination` function
-This function will create and insert/append the elements needed for the pagination buttons
-*/
+let searchInput = document.getElementById('search');
+searchInput.addEventListener('keyup', (e) => {
+    let searchText = searchInput.value;
+    if (searchText !== '') {
+        filterData(data, searchText);
+    }
+});
+
+let searchButton = document.getElementById('search-button');
+searchButton.addEventListener('click', (e) => {
+    let searchText = searchInput.value;
+    if (searchText !== '') {
+        filterData(data, searchText);
+    }
+});
 
 
 
-/*// Call functions*/
