@@ -36,7 +36,6 @@ function showPage(list, page) {
     }
 }
 
-
 /*
  * `addPagination function creates page buttons at the bottom of the page
  * calls show page when a button is cliked
@@ -74,23 +73,17 @@ function addPagination(list) {
 /* filterData function uses the string typed into the 
  * search box to filter the data that will be displayed */
 function filterData(data, searchText) {
-    let filteredList;
+    let filteredList = new Array();
 
     for (i = 0; i < data.length; i++) {
         let firstName = data[i].name.first.toLowerCase();
         let lastName = data[i].name.last.toLowerCase();
         if (firstName.indexOf(searchText.toLowerCase()) !== -1 || lastName.indexOf(searchText.toLowerCase()) !== -1) {
-            console.log("yo");
+            filteredList.push(data[i]);          
         }
     }
+    addPagination(filteredList);
 }
-
-
-//call showPage for initial view
-showPage(data, 1);
-
-//create page buttons
-addPagination(data);
 
 let header = document.querySelector('header');
 let searchForm = document.createElement('form');
@@ -120,5 +113,11 @@ searchButton.addEventListener('click', (e) => {
     }
 });
 
+//call showPage for initial view
+showPage(data, 1);
 
+//create page buttons
+if (searchInput.value === '') {
+    addPagination(data);
+}
 
