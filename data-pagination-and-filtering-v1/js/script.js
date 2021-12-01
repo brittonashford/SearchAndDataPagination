@@ -7,27 +7,26 @@ FSJS Project 2 - Data Pagination and Filtering
 /*
 This function will create and insert/append the elements needed to display a "page" of nine students
 */
-
-
 function showPage(list, page) {
     const itemsPerPage = 9;
     let startIndex = (page * itemsPerPage) - itemsPerPage;
     let endIndex = (page * itemsPerPage);
-    let studentList = document.querySelector('ul.student-list');
+    
 
     studentList.innerHTML = '';
+    let studentItem = '';
 
     for (i = 0; i < list.length; i++) {
         if (i >= startIndex && i < endIndex) {
-            let studentItem = document.createElement('li');
+            studentItem = document.createElement('li');
             studentItem.innerHTML = `<li class="student-item cf">
                 <div class="student-details">
-                    <img class="avatar" src=${data[i].picture.large} alt="Profile Picture">
-                    <h3>${data[i].name.first} ${data[i].name.last}</h3>
-                    <span class="email">${data[i].email}</span>
+                    <img class="avatar" src=${list[i].picture.large} alt="Profile Picture">
+                    <h3>${list[i].name.first} ${list[i].name.last}</h3>
+                    <span class="email">${list[i].email}</span>
                 </div>
                 <div class="joined-details">
-                    <span class="date">Joined: ${data[i].registered.date}</span>
+                    <span class="date">Joined: ${list[i].registered.date}</span>
                 </div>
             </li>`
 
@@ -43,6 +42,7 @@ function showPage(list, page) {
 function addPagination(list) {
     let linkList = document.querySelector('ul.link-list');
     const numOfPages = Math.ceil(list.length / 9);
+    const firstPage = document.querySelector('button');
 
     linkList.innerHTML = '';
 
@@ -55,17 +55,22 @@ function addPagination(list) {
 
         linkList.insertAdjacentHTML('beforeend', button.innerHTML);
     }
-
-    const firstPage = document.querySelector('button');
+  
     firstPage.className = "active";
 
+/* retrieves additional pages of data when the user clicks a page button */
     linkList.addEventListener("click", (e) => {
         console.log(e.target);
         if (e.target.type === 'button') {
             let activeBtn = document.querySelector('.active');
             activeBtn.className = '';
             e.target.className = 'active';
-            showPage(list, e.target.textContent);
+
+            if (filtered) {
+                showPage(filteredList, e.target.textContent);
+            } else {
+                showPage(list, e.target.textContent);
+            }
         }
     })
 }
@@ -73,8 +78,7 @@ function addPagination(list) {
 /* filterData function uses the string typed into the 
  * search box to filter the data that will be displayed */
 function filterData(data, searchText) {
-    let filteredList = new Array();
-
+    filteredList = [];
     for (i = 0; i < data.length; i++) {
         let firstName = data[i].name.first.toLowerCase();
         let lastName = data[i].name.last.toLowerCase();
@@ -82,11 +86,19 @@ function filterData(data, searchText) {
             filteredList.push(data[i]);          
         }
     }
+    showPage(filteredList, 1);
     addPagination(filteredList);
+    filtered = true;
 }
 
-let header = document.querySelector('header');
-let searchForm = document.createElement('form');
+/*global variables*/
+let filteredList = new Array();
+let filtered = false;
+const header = document.querySelector('header');
+const searchForm = document.createElement('form');
+let studentList = document.querySelector('ul.student-list');
+
+/*This inserts the HTML for the search bar*/
 searchForm.innerHTML = `
     <form>
         <label for="search" class="student-search">
@@ -97,19 +109,46 @@ searchForm.innerHTML = `
     </form>`;
 header.insertAdjacentHTML('beforeend', searchForm.innerHTML);
 
+/*event listener that reacts to the user typing */
 let searchInput = document.getElementById('search');
+
 searchInput.addEventListener('keyup', (e) => {
     let searchText = searchInput.value;
+
     if (searchText !== '') {
         filterData(data, searchText);
-    }
+        if (filteredList.length === 0) {
+            studentList.innerHTML = "<h2>No results match your search criteria</h2>";
+        } else {
+            showPage(filteredList, 1);
+            addPagination(filteredList);
+            
+        }
+    } else if (searchText === '') {
+        showPage(data, 1);
+        addPagination(data);
+        filtered = false;
+    }  
 });
 
+/*event listener in case text is copy/pasted and then 'search' is clicked*/
 let searchButton = document.getElementById('search-button');
+const noResultsHTML = "<h2>No results match your search criteria</h2>";
 searchButton.addEventListener('click', (e) => {
     let searchText = searchInput.value;
+
     if (searchText !== '') {
         filterData(data, searchText);
+        if (filteredList.length === 0) {
+            studentList.insertAdjacentHTML("afterbegin", noResultsHTML);
+        } else {
+            showPage(filteredList, 1);
+            addPagination(filteredList);
+
+        }
+    } else if (searchText === '') {
+        showPage(data, 1);
+        addPagination(data);
     }
 });
 
@@ -117,7 +156,6 @@ searchButton.addEventListener('click', (e) => {
 showPage(data, 1);
 
 //create page buttons
-if (searchInput.value === '') {
-    addPagination(data);
-}
+addPagination(data);
+
 
