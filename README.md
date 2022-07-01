@@ -1,2 +1,4 @@
 # SearchAndDataPagination
-Treehouse JS Project #2
+Pagination and real-time data filtering 
+
+Live Link: https://brittonashford.github.io/SearchAndDataPagination/
